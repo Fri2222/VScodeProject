@@ -12,6 +12,8 @@
     (clear steel2)
     (clear steel5)
 
+
+
     (= (priority steel1) 1)
     (= (priority steel2) 2)
     (= (priority steel3) 3)
@@ -32,7 +34,6 @@
     (= (length-truck truck) 15)
     (= (weight-turck truck) 10)
 
-    (has-empty-area truck)
 
     ;(empty position1)
 
@@ -63,9 +64,9 @@
 
 (:goal (and
 
-(at steel1 truck)
-(at steel5 truck)
-(at steel4 truck)
+(at steel1 position1)
+(at steel5 position1)
+(at steel4 position1)
     
 ))
 
