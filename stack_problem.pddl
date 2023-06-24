@@ -3,6 +3,7 @@
     steel1 steel2 steel3 steel4 steel5 - steel
     position1 - position
     truck - truck
+    location1 location2 - location
 )
 
 (:init
@@ -12,7 +13,17 @@
     (clear steel2)
     (clear steel5)
 
+    (truck-in truck location1)
 
+    (connected_by_way location1 location2)
+    (connected_by_way location2 location1)
+
+
+    (steel-in steel1 location1)
+    (steel-in steel2 location1)
+    (steel-in steel3 location1)
+    (steel-in steel4 location1)
+    (steel-in steel5 location1)
 
     (= (priority steel1) 1)
     (= (priority steel2) 2)
@@ -35,7 +46,7 @@
     (= (weight-turck truck) 10)
 
 
-    ;(empty position1)
+    (empty position1)
 
     (can-stack steel1 steel2)
     (can-stack steel1 steel3)
@@ -63,11 +74,11 @@
 )
 
 (:goal (and
+(steel-in steel1 location2)
+(steel-in steel5 location2)
+(steel-in steel4 location2)
+(truck-in truck location2)
 
-(at steel1 position1)
-(at steel5 position1)
-(at steel4 position1)
-    
 ))
 
 ;un-comment the following line if metric is needed
