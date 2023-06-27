@@ -3,7 +3,7 @@
 (define (domain stack-text)
 
 ;remove requirements that are not needed
-(:requirements :typing  :fluents :negative-preconditions)
+(:requirements :typing  :fluents :negative-preconditions :equality)
 (:types 
     steel
     container
@@ -23,6 +23,11 @@
     (steel-on ?s1 - steel ?s2 - steel)
     (steel-at ?s - steel ?c - container)
     (steel-in ?s - steel ?l - location)
+    (has-caculated ?steel)
+
+    (plate ?s - steel)
+    (pipe ?s - steel)
+    (section ?s - steel)
 
     (truck-in ?t - truck ?l - location)
 
@@ -48,13 +53,16 @@
     (money-cost) - number
 
     (priority ?steel)
+    (quantity ?steel)
     (length-steel ?steel )
     (breadth-steel ?steel)
+    (heigth-steel ?steel)
+    (diameter-steel ?steel)
     (weight-steel ?steel)
-    (heigth ?steel)
 
     (length-container ?container)
     (breadth-container ?container)
+    (max-weigth ?container)
 
     (distance ?l1 - location ?l2 - location)
 
@@ -67,7 +75,6 @@
 
 )
 
-;caculate the weight of steel(weight=)
 
 ;move steel from location to the bottom of container
 (:action move-steel-container
@@ -80,9 +87,11 @@
         (not (bottom ?s))
         (with ?c ?t)
         (available-through ?t ?l)
+        (has-caculated ?s)
         (>= (fuel ?t) 0)
         (<= (length-steel ?s ) (length-container ?c))
         (<= (breadth-steel ?s) (breadth-container ?c))
+        (<= (* (weight-steel ?s) (quantity ?s)) (max-weigth ?c))
         )
     :effect (and
         (steel-at ?s ?c)
@@ -105,10 +114,12 @@
         (steel-in ?steel ?l)
         (with ?c ?t)
         (available-through ?t ?l)
+        (has-caculated ?steel)
         (>= (fuel ?t) 0)
         (<= (length-steel ?steel ) (length-container ?c))
         (<= (breadth-steel ?steel) (breadth-container ?c))
         (<= (priority ?steel) (priority ?tosteel))
+        (<= (* (weight-steel ?steel) (quantity ?steel)) (max-weigth ?c))
      )
     :effect (and 
         (not (steel-in ?steel ?l))
@@ -261,17 +272,69 @@
 
 
 (:action acquire-container
-    :parameters (?t - truck ?c - container ?l - location)
+    :parameters (?t - truck ?c1 - container ?l - location ?c2 - container)
     :precondition (and 
             (truck-in ?t ?l)
-            ;(container-in ?c ?l)
-            (not (with ?c ?t ))
+            (container-in ?c1 ?l)
+            (not (with ?c2 ?t ))
             (not (can-exchange ?t))
+            (not (= ?c1 ?c2))
             )
     :effect (and 
-            (with ?c ?t )
+            (with ?c1 ?t )
             (can-exchange ?t)
-            (not (container-in ?c ?l))
+            (not (container-in ?c1 ?l))
+            )
+)
+
+;caculate the weight of steel(weight=height*length*bredth*coefficient)
+(:action caculate-weigth-plate
+    :parameters (?s - steel)
+    :precondition (and 
+        (plate ?s)
+            (not (has-caculated ?s))
+            )
+    :effect (and 
+        (has-caculated ?s)
+            (assign (weight-steel ?s) 
+                    (* (length-steel ?s) 
+                        (* (breadth-steel ?s) 
+                            (* (heigth-steel ?s) 
+                                (* (quantity ?s) 7.5)))))
+            )
+)
+
+(:action caculate-weigth-pipe
+    :parameters (?s - steel)
+    :precondition (and 
+        (pipe ?s)
+            (not (has-caculated ?s))
+            )
+    :effect (and 
+        (has-caculated ?s)
+            (assign (weight-steel ?s) 
+                    (* (length-steel ?s)
+                        (* (breadth-steel ?s)
+                            (* (diameter-steel ?s) 
+                                (* (quantity ?s) 0.02466))))
+                )   
+        )
+)
+
+(:action caculate-weigth-section
+    :parameters (?s - steel)
+    :precondition (and 
+        (section ?s)
+            (not (has-caculated ?s))
+            )
+    :effect (and 
+        (has-caculated ?s)
+            (assign (weight-steel ?s) 
+                    (* (diameter-steel ?s)
+                        (* (diameter-steel ?s)
+                            (* (length-steel ?s) 
+                                (* (quantity ?s) 0.00617))))
+            )
             )
 )
 
