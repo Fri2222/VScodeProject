@@ -1,8 +1,8 @@
 (define (problem stack-text-p) (:domain stack-text)
 (:objects 
     steel-plate pipe angle_steel round-steel wire-rod - steel
-    container1 container2 container3 container4 container5 - container
-    heavy-truck medium-truck light-truck mini-truck - truck
+    container0101 container0102 container2 container3 container4 container5 - container
+    heavy-truck1 heavy-truck2 medium-truck light-truck mini-truck - truck
     location1 location2 location-gas - location
     driver1 - driver
 )
@@ -20,7 +20,8 @@
     (driver-in driver1 location1)
 
     ;the initial position of the truck
-    (truck-in heavy-truck location-gas)
+    (truck-in heavy-truck1 location-gas)
+    (truck-in heavy-truck2 location-gas)
     (truck-in medium-truck location1)
     (truck-in light-truck location1)
     (truck-in mini-truck location2)
@@ -33,16 +34,27 @@
     (steel-in wire-rod location1)
 
 
-    ;define heavy-truck,medium-truck,light-truck,minitruck
+    ;define heavy-truck1,medium-truck,light-truck,minitruck
     ;define the speed,container,fuel,max-fuel,license-require of each truck
-    (= (speed heavy-truck) 20)
-    (with container1 heavy-truck)
-    (empty container1)
-    (= (length-container container1) 20)
-    (= (breadth-container container1) 15)
-    (= (fuel heavy-truck) 0)
-    (= (max-fuel heavy-truck) 100)
-    (= (license-require heavy-truck) 15)
+    (= (speed heavy-truck1) 20)
+    (with container0101 heavy-truck1)
+    (empty container0101)
+    (= (length-container container0101) 20)
+    (= (breadth-container container0101) 15)
+    (= (fuel heavy-truck1) 0)
+    (= (max-fuel heavy-truck1) 100)
+    (= (license-require heavy-truck1) 15)
+    (can-exchange heavy-truck1)
+
+    (= (speed heavy-truck2) 20)
+    (with container0102 heavy-truck2)
+    (empty container0102)
+    (= (length-container container0102) 20)
+    (= (breadth-container container0102) 15)
+    (= (fuel heavy-truck2) 0)
+    (= (max-fuel heavy-truck2) 100)
+    (= (license-require heavy-truck2) 15)
+    (can-exchange heavy-truck2)
 
     (= (speed medium-truck) 30)
     (with container2 medium-truck)
@@ -70,6 +82,27 @@
      (= (fuel mini-truck) 10)
     (= (max-fuel mini-truck) 40)
     (= (license-require  mini-truck) 13)
+
+    ;whether the truck could through the location
+    (available-through heavy-truck1 location1)
+    (available-through heavy-truck1 location2)
+    (available-through heavy-truck1 location-gas)
+
+    (available-through heavy-truck2 location1)
+    (available-through heavy-truck2 location2)
+    (available-through heavy-truck2 location-gas)
+
+    (available-through medium-truck location1)
+    (available-through medium-truck  location2)
+    (available-through medium-truck  location-gas)
+
+    (available-through light-truck location1)
+    (available-through light-truck location2)
+    (available-through light-truck location-gas)
+
+    (available-through mini-truck location1)
+    (available-through mini-truck location2)
+    (available-through mini-truck location-gas)
 
     ;road network
     (connected-by-way location1 location2)
@@ -154,12 +187,13 @@
 (:goal (and
 ;(steel-in steel-plate location2)
 ;(steel-in wire-rod location2)
-(steel-in round-steel location2)
+;(steel-in round-steel location2)
 (driver-in driver1 location2)
-;(= (fuel heavy-truck) (max-fuel heavy-truck))
+;(= (fuel heavy-truck1) (max-fuel heavy-truck1))
 
 ))
 
 
 (:metric minimize (+(time-cost) (money-cost)))
 )
+

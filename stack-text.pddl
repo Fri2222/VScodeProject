@@ -29,35 +29,45 @@
     (driver-in ?d - driver ?l - location)
     (driver-at ?d - driver ?t - truck)
 
+    (container-in ?c - container ?l - location)
+
     (connected-by-way ?l1 - location ?l2 - location)
     (connected-by-expressway ?l1 - location ?l2 - location)
 
     (with ?c - container ?t - truck )
+    (can-exchange ?t)
     (gas ?l - location)
     (empty ?c - container)
+    (available-through ?t - truck ?l - location)
 
 )
 
 
 (:functions 
+    (time-cost) - number
+    (money-cost) - number
+
     (priority ?steel)
     (length-steel ?steel )
     (breadth-steel ?steel)
     (weight-steel ?steel)
+    (heigth ?steel)
+
     (length-container ?container)
     (breadth-container ?container)
+
     (distance ?l1 - location ?l2 - location)
+
     (speed ?t - truck)
-    (time-cost) - number
-    (money-cost) - number
     (fuel ?t - truck)
     (max-fuel ?t -truck)
+
     (license ?d - driver)
     (license-require ?t - truck)
 
 )
 
-
+;caculate the weight of steel(weight=)
 
 ;move steel from location to the bottom of container
 (:action move-steel-container
@@ -69,6 +79,7 @@
         (empty ?c)
         (not (bottom ?s))
         (with ?c ?t)
+        (available-through ?t ?l)
         (>= (fuel ?t) 0)
         (<= (length-steel ?s ) (length-container ?c))
         (<= (breadth-steel ?s) (breadth-container ?c))
@@ -93,6 +104,7 @@
         (truck-in ?t ?l)
         (steel-in ?steel ?l)
         (with ?c ?t)
+        (available-through ?t ?l)
         (>= (fuel ?t) 0)
         (<= (length-steel ?steel ) (length-container ?c))
         (<= (breadth-steel ?steel) (breadth-container ?c))
@@ -117,6 +129,7 @@
         (steel-at ?s_top ?c)
         (truck-in ?t ?l)
         (with ?c ?t)
+        (available-through ?t ?l)
         (>= (fuel ?t) 0)
         )
     :effect (and 
@@ -136,6 +149,7 @@
         (not (empty ?c))
         (truck-in ?t ?l)
         (with ?c ?t)
+        (available-through ?t ?l)
         (>= (fuel ?t) 0)
         )
     :effect (and 
@@ -211,7 +225,7 @@
             (not (truck-in ?t ?l1))
                 (increase (time-cost) (/ (distance ?l1 ?l2) (speed ?t)))
                 (decrease (fuel ?t) (distance ?l1 ?l2))  
-
+                (increase (money-cost) (* (distance ?l1 ?l2) 0.1))
             )
 )
 
@@ -227,6 +241,37 @@
             (increase (time-cost) (*(- (max-fuel ?t) (fuel ?t)) 0.2))
             (increase (money-cost) (fuel ?t))
             (assign (fuel ?t) (max-fuel ?t))
+            )
+)
+
+;trailar exhange the container
+(:action loss-container
+    :parameters (?t - truck ?c - container ?l - location)
+    :precondition (and 
+            (truck-in ?t ?l)
+            (with ?c ?t )
+            (can-exchange ?t)
+        )
+    :effect (and 
+            (container-in ?c ?l)
+            (not (can-exchange ?t))
+            (not (with ?c ?t ))
+            )
+)
+
+
+(:action acquire-container
+    :parameters (?t - truck ?c - container ?l - location)
+    :precondition (and 
+            (truck-in ?t ?l)
+            ;(container-in ?c ?l)
+            (not (with ?c ?t ))
+            (not (can-exchange ?t))
+            )
+    :effect (and 
+            (with ?c ?t )
+            (can-exchange ?t)
+            (not (container-in ?c ?l))
             )
 )
 
