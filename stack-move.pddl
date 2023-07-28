@@ -109,6 +109,7 @@
         (truck-in ?t ?l)
         (with ?c ?t)
         (not (steel-in ?s_top ?l))
+        (not (empty ?c))
         )
     :effect (and 
         (steel-in ?s_top ?l)
@@ -127,6 +128,7 @@
         (truck-in ?t ?l)
         (with ?c ?t)
         (not (steel-in ?s ?l))
+        (clear ?s)
         )
     :effect (and 
         (not (bottom ?s)) 

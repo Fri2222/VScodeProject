@@ -3,7 +3,7 @@
     steel-plate pipe angle_steel round-steel wire-rod - steel
     container1 container2 container3 container4 container5 - container
     heavy-truck medium-truck light-truck mini-truck - truck
-    location1 location2 - location
+    location1 location2 location-isolate - location
     driver1 - driver
 )
 
