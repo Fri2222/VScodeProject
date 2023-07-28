@@ -127,7 +127,6 @@
 (steel-in steel-plate location2)
 (steel-in wire-rod location2)
 (steel-in round-steel location2)
-(steel-on round-steel steel-plate)
 ))
 
 

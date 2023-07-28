@@ -108,6 +108,7 @@
         (steel-at ?s_top ?c)
         (truck-in ?t ?l)
         (with ?c ?t)
+        (not (steel-in ?s_top ?l))
         )
     :effect (and 
         (steel-in ?s_top ?l)
@@ -125,6 +126,7 @@
         (not (empty ?c))
         (truck-in ?t ?l)
         (with ?c ?t)
+        (not (steel-in ?s ?l))
         )
     :effect (and 
         (not (bottom ?s)) 
@@ -225,5 +227,6 @@
             (not (container-in ?c1 ?l))
             )
 )
+
 
 )
