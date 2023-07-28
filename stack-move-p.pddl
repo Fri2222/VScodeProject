@@ -1,50 +1,56 @@
-(define (problem stack_problem) (:domain stack-text )
+(define (problem stack_problem) (:domain stack)
 (:objects 
     steel-plate pipe angle_steel round-steel wire-rod - steel
     container1 container2 container3 container4 container5 - container
     heavy-truck medium-truck light-truck mini-truck - truck
     location1 location2 - location
+    driver1 - driver
 )
 
 (:init
 
     (= (time-cost) 0)
 
+    (driver-in driver1 location1)
+    (= (license driver1) 15)
+
     (truck-in heavy-truck location1)
     (= (speed heavy-truck) 20)
+    (= (license-require heavy-truck) 15)
+
     (with container1 heavy-truck)
     (empty container1)
-        (= (length-container container1) 20)
+    (= (length-container container1) 20)
     (= (breadth-container container1) 15)
-    
+
 
     (truck-in medium-truck location1)
     (= (speed medium-truck) 30)
+    (= (license-require medium-truck) 15)
+
     (with container2 medium-truck)
     (empty container2)
-     (= (length-container container2) 18)
+    (= (length-container container2) 18)
     (= (breadth-container container2) 12)
-    
+
 
     (truck-in light-truck location1)
     (= (speed light-truck) 20)
+    (= (license-require light-truck) 14)
+
     (with container3 light-truck)
     (empty container3)
      (= (length-container container3) 14)
     (= (breadth-container container3) 10)
-    
-
-
-
 
     (truck-in mini-truck location1)
     (= (speed mini-truck) 20)
+    (= (license-require  mini-truck) 13)
+
     (with container4 mini-truck)
     (empty container4)
-      (= (length-container container4) 10)
+    (= (length-container container4) 10)
     (= (breadth-container container4) 8)
-   
-
 
     (connected-by-way location1 location2)
     (= (distance location1 location2) 10)
@@ -92,8 +98,6 @@
 
 
 
-
-
     (can-stack steel-plate pipe)
     (can-stack steel-plate angle_steel)
     (can-stack steel-plate round-steel)
@@ -124,7 +128,6 @@
 (steel-in wire-rod location2)
 (steel-in round-steel location2)
 (steel-on round-steel steel-plate)
-
 ))
 
 
