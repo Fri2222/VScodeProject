@@ -48,6 +48,7 @@
 
 (:functions 
     (time-cost) - number
+    (money-cost)- number
 
     (priority ?steel)
     (quantity ?steel)
@@ -60,6 +61,7 @@
     (length-container ?container)
     (breadth-container ?container)
     (max-weigth ?container)
+    (current-weight ?container)
 
     (distance ?l1 - location ?l2 - location)
 
@@ -81,8 +83,8 @@
     )
     :effect (and 
             (increase (time-cost) (* (- (max-fuel-truck ?t) (fuel-truck ?t)) 0.2))
-            ;(increase (money-cost) (- (max-fuel-truck ?t) (fuel-truck ?t)))
-            (assign (fuel-truck ?t) (max-fuel-truck ?t))
+            (increase (money-cost) (- (max-fuel-truck ?t) (fuel-truck ?t)))
+            (increase (fuel-truck ?t) (- (max-fuel-truck ?t ) (fuel-truck ?t)))
             )
 )
 
@@ -102,6 +104,8 @@
         (not (steel-in ?s ?l))
         (not (empty ?c))
             (increase (time-cost) (/ (weight-steel ?s) 10))
+            (assign (current-weight ?c) 
+                    (* (weight-steel ?s) (quantity ?s)))
         )
 )
 
@@ -120,6 +124,9 @@
         (<= (length-steel ?steel ) (length-container ?c))
         (<= (breadth-steel ?steel) (breadth-container ?c))
         (>= (priority ?steel) (priority ?tosteel))
+        (<= (+ (* (weight-steel ?steel) (quantity ?steel)) 
+                (current-weight ?c))   
+                    (max-weigth ?c))
      )
     :effect (and 
         (steel-on ?steel ?tosteel)
@@ -127,26 +134,34 @@
         (not (clear ?tosteel))
         (not (steel-in ?steel ?l))
             (increase (time-cost) (/ (weight-steel ?steel) 10))
+            (increase (current-weight ?c) 
+                    (* (weight-steel ?steel) (quantity ?steel)))
         )
 )
 
 (:action unload-steel-steel
-    :parameters (?s_top - steel ?s_under - steel ?t - truck ?c - container ?l - location)
+    :parameters (?s-top - steel ?s-under - steel ?t - truck ?c - container ?l - location)
     :precondition (and 
-        (clear ?s_top)
-        (steel-on ?s_top ?s_under)
-        (steel-at ?s_top ?c)
         (truck-in ?t ?l)
         (with ?c ?t)
-        (not (steel-in ?s_top ?l))
         (not (empty ?c))
-        (has-caculated ?s_top)
+        (steel-at ?s-top ?c)
+        (not (clear ?s-under))
+        (steel-on ?s-top ?s-under)
+        (not (steel-in ?s-top ?l))
+;Do not delete this line of code((has-caculated ?s-top)),or the program will
+;go through all the loading and unloading actions
+        (has-caculated ?s-top)
         )
     :effect (and 
-        (steel-in ?s_top ?l)
-        (clear ?s_under)
-        (not (steel-at ?s_top ?c))
-            (increase (time-cost) (/ (weight-steel ?s_top) 10))
+        (steel-in ?s-top ?l)
+        (clear ?s-under)
+        (not (steel-at ?s-top ?c))
+        (not (steel-on ?s-top ?s-under))
+            (increase (time-cost) (/ (weight-steel ?s-top) 10))
+            (decrease (current-weight ?c) 
+                (+ (current-weight ?c) 
+                    (* (weight-steel ?s-top) (quantity ?s-top))))
         )
 )
 
@@ -159,6 +174,8 @@
         (truck-in ?t ?l)
         (with ?c ?t)
         (not (steel-in ?s ?l))
+;Do not delete this line of code(has-caculated ?s),or the program will
+;go through all the loading and unloading actions
         (has-caculated ?s)
         )
     :effect (and 
@@ -167,6 +184,9 @@
         (empty ?c)
         (steel-in ?s ?l)
             (increase (time-cost) (/ (weight-steel ?s) 10))
+            (decrease (current-weight ?c) 
+                (+ (current-weight ?c) 
+                    (* (weight-steel ?s) (quantity ?s))))
             )
 )
 ;driver get in truck
@@ -206,12 +226,13 @@
             (connected-by-way ?l1 ?l2)
             (driver-at ?d ?t)
             (>= (license ?d) (license-require ?t)) 
-            (>= (fuel-truck ?t) (distance ?l1 ?l2))
+            (>= (fuel-truck ?t) (/ (distance ?l1 ?l2) 10))
             )
     :effect (and 
             (truck-in ?t ?l2)
             (not (truck-in ?t ?l1))
                 (increase (time-cost) (/ (distance ?l1 ?l2) (speed ?t)))
+                (decrease (fuel-truck ?t) (/ (distance ?l1 ?l2) 10))
             )
 )
 
@@ -222,12 +243,13 @@
             (connected-by-expressway ?l1 ?l2)
             (driver-at ?d ?t)
             (>= (license ?d) (license-require ?t)) 
-            (>= (fuel-truck ?t) (distance ?l1 ?l2))
+            (>= (fuel-truck ?t) (/ (distance ?l1 ?l2) 10))
             )
     :effect (and 
             (truck-in ?t ?l2)
             (not (truck-in ?t ?l1))
                 (increase (time-cost) (/ (distance ?l1 ?l2) (speed ?t)))
+                (decrease (fuel-truck ?t) (/ (distance ?l1 ?l2) 10))
             )
 )
 
@@ -241,7 +263,6 @@
         )
     :effect (and 
             (container-in ?c ?l)
-            (not (can-exchange ?t))
             (not (with ?c ?t ))
             )
 )
@@ -253,12 +274,11 @@
             (truck-in ?t ?l)
             (container-in ?c1 ?l)
             (not (with ?c2 ?t ))
-            (not (can-exchange ?t))
+            (can-exchange ?t)
             (not (= ?c1 ?c2))
             )
     :effect (and 
             (with ?c1 ?t )
-            (can-exchange ?t)
             (not (container-in ?c1 ?l))
             )
 )

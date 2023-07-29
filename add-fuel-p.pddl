@@ -20,12 +20,13 @@
 
 ;the initial state of time-cost and money-cost
     (= (time-cost) 0)
+    (= (money-cost) 0)
 
 ;the initial position of the driver
-    (driver-in driver1 gas-station1)
+    (driver-in driver1 location1)
 
 ;the initial position of the truck
-    (truck-in heavy-truck1 gas-station1)
+    (truck-in heavy-truck1 location1)
     (truck-in heavy-truck2 location1)
     (truck-in medium-truck location1)
     (truck-in light-truck location1)
@@ -38,13 +39,12 @@
     (steel-in round-steel location1)
     (steel-in wire-rod location1)
 
-
 ;define heavy-truck1,medium-truck,light-truck,minitruck
 ;define the speed,container,fuel-truck-truck,max-fuel-truck,license-require of each truck
     
     (= (speed heavy-truck1) 20)
-    (= (fuel-truck heavy-truck1) 0)
-    (= (max-fuel-truck heavy-truck1) 100)
+    (= (fuel-truck heavy-truck1) 0.5)
+    (= (max-fuel-truck heavy-truck1) 300)
     (= (license-require heavy-truck1) 15)
     (can-exchange heavy-truck1)
 
@@ -52,6 +52,7 @@
     (empty container-heavy1)
     (= (length-container container-heavy1) 20)
     (= (breadth-container container-heavy1) 15)
+    (= (current-weight container-heavy1) 0)
     (= (max-weigth container-heavy1) 50)
     
 
@@ -65,6 +66,7 @@
     (empty container-heavy2)
     (= (length-container container-heavy2) 20)
     (= (breadth-container container-heavy2) 15)
+    (= (current-weight container-heavy2) 0)
     (= (max-weigth container-heavy2) 50)
 
     
@@ -78,12 +80,13 @@
     (empty container-medium)
     (= (length-container container-medium) 18)
     (= (breadth-container container-medium) 12)
+    (= (current-weight container-medium) 50)
     (= (max-weigth container-medium) 50)
 
 
     ;basic information of light-truck
     (= (speed light-truck) 20)
-    (= (fuel-truck light-truck) 50)
+    (= (fuel-truck light-truck) 0)
     (= (max-fuel-truck light-truck) 60)
     (= (license-require light-truck) 14)
 
@@ -91,12 +94,13 @@
     (empty container-light)
     (= (length-container container-light) 14)
     (= (breadth-container container-light) 10)
+    (= (current-weight container-light) 50)
     (= (max-weigth container-light) 50)
 
 
     ;basic information of mini-truck
     (= (speed mini-truck) 20)
-    (= (fuel-truck mini-truck) 80)
+    (= (fuel-truck mini-truck) 0)
     (= (max-fuel-truck mini-truck) 40)
     (= (license-require  mini-truck) 13)
 
@@ -104,6 +108,7 @@
     (empty container-mini)
     (= (length-container container-mini) 10)
     (= (breadth-container container-mini) 8)
+    (= (current-weight container-mini) 50)
     (= (max-weigth container-mini) 50)
 
 
@@ -118,15 +123,15 @@
     (= (distance location2 location1) 10)
 
     (connected-by-way location1 gas-station1)
-    (= (distance location1 gas-station1) 10)
+    (= (distance location1 gas-station1) 5)
     (connected-by-way gas-station1 location1)
-    (= (distance location1 gas-station1) 10)
+    (= (distance location1 gas-station1) 5)
 
     ;road connecting location2
     (connected-by-way location2 gas-station1)
-    (= (distance location2 gas-station1) 10)
+    (= (distance location2 gas-station1) 100)
     (connected-by-way gas-station1 location2)
-    (= (distance gas-station1 location1) 10)
+    (= (distance gas-station1 location1) 100)
 
     ;road connecting location3
     (connected-by-way location3 gas-station1)
@@ -266,12 +271,13 @@
 )
 
 (:goal (and
-(steel-in steel-plate1 location4)
+(steel-in steel-plate1 location2)
 (steel-in wire-rod location2)
 (steel-in round-steel location2)
+
 
 ))
 
 
-(:metric minimize (time-cost))
+(:metric minimize (+ (time-cost) (money-cost)))
 )
